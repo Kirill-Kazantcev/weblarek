@@ -1,4 +1,3 @@
-//Класс для связи приложения с сервером
 import { IApi, IApiProducts, TOrder, TOrderResponse } from "../../types";
 
 export class WebLarekApi {
@@ -7,12 +6,11 @@ export class WebLarekApi {
   constructor(api: IApi) {
     this.api = api;
   }
-
   getProducts(): Promise<IApiProducts> {
-    return this.api.get('/product/');
+    return this.api.get("/product/");
   }
 
   postOrder(data: TOrder): Promise<TOrderResponse> {
-    return this.api.post('/order/', data);
+    return this.api.post("/order/", data);
   }
 }

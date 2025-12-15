@@ -1,46 +1,51 @@
-import { EventEmitter } from "../base/Events";
 import { IProduct } from '../../types';
+import { EventEmitter } from "../base/Events";
+import { CDN_URL } from "../../utils/constants";
 
+// Модель для работы с товарами
 export class Products {
   private items: IProduct[] = [];
-  private checkItem: IProduct | null = null; // Название осталось checkItem
+  private selectedItem: IProduct | null = null;
 
   constructor(private events: EventEmitter) {}
 
-  // Сохранение массива товаров из API
+  // Сохранение товаров из API с обработкой изображений
   setItems(apiProducts: IProduct[]): void {
-    this.items = apiProducts;
-    this.events.emit('products:changed');
+    this.items = apiProducts.map(product => ({
+      ...product,
+      image: CDN_URL + product.image.replace('.svg', '.png')
+    }));
+    this.events.emit('products:loaded');
   }
 
-  // Получение всех товаров каталога
+  // Получение всех товаров
   getItems(): IProduct[] {
     return this.items;
   }
 
-  // Получение товара по ID
+  // Поиск товара по ID
   getItemById(id: string): IProduct | undefined {
     return this.items.find(item => item.id === id);
   }
 
-  // Установка товара для детального просмотра (старое название)
-  setCheckItemById(id: string): boolean {
+  // Установка выбранного товара
+  setSelectedItem(id: string): boolean {
     const item = this.getItemById(id);
     if (item) {
-      this.checkItem = item;
-      this.events.emit('product:selected');
+      this.selectedItem = item;
+      this.events.emit('product:selected', item);
       return true;
     }
     return false;
   }
 
-  // Получение товара для детального просмотра (старое название)
-  getCheckItem(): IProduct | null {
-    return this.checkItem;
+  // Получение выбранного товара
+  getSelectedItem(): IProduct | null {
+    return this.selectedItem;
   }
 
   // Очистка выбранного товара
-  clearCheckItem(): void {
-    this.checkItem = null;
+  clearSelectedItem(): void {
+    this.selectedItem = null;
   }
 }

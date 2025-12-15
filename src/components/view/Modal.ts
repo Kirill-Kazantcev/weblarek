@@ -1,44 +1,28 @@
-import { Component } from "../base/Component";
-import { ensureElement } from "../../utils/utils";
-
-export class Modal extends Component<null> {
-  private closeButton: HTMLElement;
+// Модальное окно приложения
+export class Modal {
+  private closeBtn: HTMLElement;
   private content: HTMLElement;
   private escapeHandler: ((event: KeyboardEvent) => void) | null = null;
-  private scrollY: number = 0;
+  private scrollLocked: boolean = false;
 
-  constructor(container: HTMLElement) {
-    super(container);
+  constructor(private container: HTMLElement) {
+    this.closeBtn = container.querySelector('.modal__close')!;
+    this.content = container.querySelector('.modal__content')!;
 
-    this.closeButton = ensureElement<HTMLElement>(".modal__close", this.container);
-    this.content = ensureElement<HTMLElement>(".modal__content", this.container);
+    this.closeBtn.addEventListener('click', () => this.close());
 
-    this.closeButton.addEventListener("click", () => this.close());
-    
-    this.container.addEventListener("click", (event) => {
+    this.container.addEventListener('click', (event) => {
       if (event.target === this.container) {
         this.close();
       }
     });
   }
 
-  open(content?: HTMLElement): void {
-    if (this.isOpen()) {
-      return;
-    }
+  open(content: HTMLElement) {
+    this.setContent(content);
+    this.container.classList.add('modal_active');
     
-    if (content) {
-      this.setContent(content);
-    }
-    this.container.classList.add("modal_active");
-    
-    // Блокировка скролла
-    this.scrollY = window.scrollY;
-    document.body.style.position = 'fixed';
-    document.body.style.top = `-${this.scrollY}px`;
-    document.body.style.left = '0';
-    document.body.style.width = '100%';
-    document.body.style.overflow = 'hidden';
+    this.lockScroll();
     
     this.escapeHandler = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
@@ -48,20 +32,10 @@ export class Modal extends Component<null> {
     document.addEventListener('keydown', this.escapeHandler);
   }
 
-  close(): void {
-    if (!this.isOpen()) {
-      return;
-    }
+  close() {
+    this.container.classList.remove('modal_active');
     
-    this.container.classList.remove("modal_active");
-    
-    // Восстановление скролла
-    document.body.style.position = '';
-    document.body.style.top = '';
-    document.body.style.left = '';
-    document.body.style.width = '';
-    document.body.style.overflow = '';
-    window.scrollTo(0, this.scrollY);
+    this.unlockScroll();
     
     if (this.escapeHandler) {
       document.removeEventListener('keydown', this.escapeHandler);
@@ -69,20 +43,35 @@ export class Modal extends Component<null> {
     }
   }
 
-  isOpen(): boolean {
-    return this.container.classList.contains("modal_active");
-  }
-
-  setContent(content: HTMLElement): void {
-    this.content.innerHTML = "";
+  setContent(content: HTMLElement) {
+    this.content.innerHTML = ''
     this.content.appendChild(content);
   }
 
-  getContent(): HTMLElement | null {
-    return this.content.firstElementChild as HTMLElement;
+  private lockScroll(): void {
+    if (this.scrollLocked) return;
+    
+    this.scrollLocked = true;
+    
+    document.body.style.overflow = 'hidden';
+    
+    const hasScrollbar = document.body.scrollHeight > window.innerHeight;
+    if (hasScrollbar) {
+      const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+      document.body.style.paddingRight = `${scrollbarWidth}px`;
+    }
   }
 
-  render(): HTMLElement {
-    return this.container;
+  private unlockScroll(): void {
+    if (!this.scrollLocked) return;
+    
+    this.scrollLocked = false;
+    
+    document.body.style.overflow = '';
+    document.body.style.paddingRight = '';
+  }
+
+  isOpen(): boolean {
+    return this.container.classList.contains('modal_active');
   }
 }

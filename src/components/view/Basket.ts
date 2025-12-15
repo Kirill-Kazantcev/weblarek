@@ -1,26 +1,33 @@
 import { Component } from "../base/Component";
 import { ensureElement } from "../../utils/utils";
+import { IEvents } from "../base/Events";
 
+// Корзина покупок
 export class Basket extends Component<null> {
   private basketList: HTMLElement;
   private basketButton: HTMLButtonElement;
   private basketPrice: HTMLElement;
 
-  get element(): HTMLElement {
-    return this.container;
-  }
-
-  constructor(container: HTMLElement, private onClick?: () => void) {
+  constructor(container: HTMLElement, private events: IEvents) {
     super(container);
 
-    this.basketList = ensureElement<HTMLElement>('.basket__list', this.container);
-    this.basketButton = ensureElement<HTMLButtonElement>('.basket__button', this.container);
-    this.basketPrice = ensureElement<HTMLElement>('.basket__price', this.container);
+    this.basketList = ensureElement<HTMLElement>(
+      ".basket__list",
+      this.container
+    );
+    this.basketButton = ensureElement<HTMLButtonElement>(
+      ".basket__button",
+      this.container
+    );
+    this.basketPrice = ensureElement<HTMLElement>(
+      ".basket__price",
+      this.container
+    );
 
-    
-    if (this.onClick) {
-      this.basketButton.addEventListener('click', () => this.onClick!());
-    }
+    // ДОБАВЛЕНО: Обработчик клика для кнопки оформления заказа
+    this.basketButton.addEventListener("click", () => {
+      this.events.emit("order:set");
+    });
   }
 
   set totalPrice(value: number) {
@@ -32,7 +39,7 @@ export class Basket extends Component<null> {
   }
 
   set renderedCards(cards: HTMLElement[]) {
-    this.basketList.innerHTML = '';
+    this.basketList.innerHTML = "";
     if (cards.length > 0) {
       this.basketList.append(...cards);
     }

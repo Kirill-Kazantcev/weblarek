@@ -1,48 +1,53 @@
-import { EventEmitter } from '../base/Events';
 import { IProduct } from '../../types';
+import { EventEmitter } from '../base/Events';
 
+// Модель корзины покупок
 export class ShoppingCart {
-  private cartItems: IProduct[] = [];
+  private items: IProduct[] = [];
 
   constructor(private events: EventEmitter) {}
 
-  getCartItems(): IProduct[] {
-    return this.cartItems;
+  getItems(): IProduct[] {
+    return this.items;
   }
 
-  addToCart(product: IProduct): void {
-    if (!this.checkItemInCart(product.id)) {
-      this.cartItems.push(product);
-      this.events.emit('cart:changed');
+  addItem(product: IProduct): void {
+    if (this.contains(product.id)) {
+      return;
     }
-  }
-
-  removeItemFromCart(product: IProduct): void {
-    this.cartItems = this.cartItems.filter(item => item.id !== product.id);
+    
+    if (product.price === null) {
+      return;
+    }
+    
+    this.items.push(product);
     this.events.emit('cart:changed');
   }
 
-  removeItemFromCartById(id: string): void {
-    this.cartItems = this.cartItems.filter(item => item.id !== id);
+  removeItem(product: IProduct): void {
+    this.items = this.items.filter(item => item.id !== product.id);
     this.events.emit('cart:changed');
   }
 
-  removeAllItemsFromCart(): void {
-    this.cartItems = [];
+  removeItemById(id: string): void {
+    this.items = this.items.filter(item => item.id !== id);
     this.events.emit('cart:changed');
   }
 
-  getCartTotalPrice(): number {
-    return this.cartItems.reduce((total, item) => {
-      return total + (item.price || 0);
-    }, 0);
+  clear(): void {
+    this.items = [];
+    this.events.emit('cart:changed');
   }
 
-  getCartTotalQuantity(): number {
-    return this.cartItems.length;
+  getTotal(): number {
+    return this.items.reduce((total, item) => total + (item.price || 0), 0);
   }
 
-  checkItemInCart(id: string): boolean {
-    return this.cartItems.some(item => item.id === id);
+  getCount(): number {
+    return this.items.length;
+  }
+
+  contains(id: string): boolean {
+    return this.items.some(item => item.id === id);
   }
 }

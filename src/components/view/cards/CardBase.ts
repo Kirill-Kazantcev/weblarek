@@ -2,6 +2,7 @@ import { Component } from "../../base/Component";
 import { IProduct } from "../../../types";
 import { ensureElement } from "../../../utils/utils";
 
+// Базовый класс для карточек товаров
 export abstract class CardBase<T extends IProduct> extends Component<T> {
   protected cardTitle: HTMLElement;
   protected cardPrice: HTMLElement;
@@ -28,5 +29,10 @@ export abstract class CardBase<T extends IProduct> extends Component<T> {
     this.cardPrice.textContent = value === null 
       ? 'Бесценно' 
       : `${value} синапсов`;
+  }
+  
+  protected setImage(element: HTMLImageElement, src: string, alt: string = ''): void {
+    element.src = src;
+    element.alt = alt;
   }
 }

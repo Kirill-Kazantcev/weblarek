@@ -1,11 +1,16 @@
 import { Component } from "../../base/Component";
-import { IFormErrors } from "../../../types";
+import { TFormErrors } from "../../../types";
 
-export abstract class FormBase extends Component<null> {
+// Базовый класс для форм
+export abstract class BaseForm extends Component<null> {
   protected formErrors: HTMLElement;
   protected submitButton: HTMLButtonElement;
 
-  protected abstract formErrorsFields: (keyof IFormErrors)[];
+  protected abstract formErrorsFields: (keyof TFormErrors)[];
+
+  get element(): HTMLElement {
+    return this.container;
+  }
 
   protected constructor(container: HTMLElement) {
     super(container);
@@ -14,11 +19,14 @@ export abstract class FormBase extends Component<null> {
     this.submitButton = this.container.querySelector('button[type="submit"]')!;
   }
 
-  showErrors(errors: Partial<IFormErrors>): void {
-    const errorMessages = Object.values(errors).filter(Boolean);
-    this.formErrors.textContent = errorMessages.length > 0 
-      ? errorMessages[0] || '' 
+  showErrors(errors: Partial<TFormErrors>): boolean {
+    const errorMessages = this.formErrorsFields
+      .map(f => errors[f])
+      .filter(Boolean);
+    this.formErrors.textContent = errorMessages.length > 0
+      ? errorMessages[0] || ''
       : '';
+    return errorMessages.length === 0;
   }
 
   submitButtonEnable(enabled: boolean): void {

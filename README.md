@@ -143,305 +143,179 @@ interface IBuyer {
 
 **Структура данных:**
 
-- `payment` - способ оплаты, `card | cash | ''` 
+- `payment` - способ оплаты, `card | cash | ''`
 - `email` - почта покупателя
 - `phone` - телефон покупателя
 - `address` - адрес доставки
 
 ### Модели данных
 
-#### Каталог товаров `Products`
+#### 1. `Products` - Каталог товаров
 
-Хранение товаров, которые можно купить в приложении
-
-**Свойства класса:**
-
-- `private items: IProduct[] = []` - хранит массив всех товаров
-- `private checkItem: IProduct | null = null` - хранит товар, выбранный для подробного отображения
-
-**Содержит методы:**
-
-- `setItems(apiProducts: IProduct[]) : void` - сохраняет товары
-- `getItems() : IProduct[]` - получает массив товары
-- `getItemById(id: string) : IProduct | undefined` - получает товар по `id`
-- `setCheckItemById(id: string) : boolean` - устанавливает товар для подробного отображения по `id`
-- `deleteCheckItemById() : boolean` - убирает товар для подробного отображения
-- `getCheckItem() : IProduct | null` - получает товар для подробного отображения
-
-#### Корзина `ShoppingCart`
-
-Хранение товаров, которые пользователь выбрал для покупки
-
-**Свойства класса:**
-
-- `private cartItems: IProduct[] = []` - массив товаров, добавленных в корзину
-
-**Содержит методы:**
-
-- `getCartItems() : IProduct[]` - получение массива товаров, которые находятся в корзине
-- `addToCart(product: IProduct) : void` - добавление товара
-- `removeItemFromCart(product: IProduct) : void` - удаление товара
-- `removeAllItemsFromCart() : void` - очистка корзины
-- `getCartTotalPrice() : number` - получение стоимости всех товаров в корзине
-- `getCartTotalQuantity() : number ` - получение количества товаров в корзине
-- `checkItemInCart(id: string) : boolean` - проверка наличия товара в корзине по его `id`
-
-#### Покупатель `Buyer`
-
-Данные покупателя, которые тот должен указать при оформлении заказа.
-
-**Свойства класса:**
-
-- `payment?: TPayment` — способ оплаты
-- `address?: string` — адрес доставки
-- `phone?: string` — телефон покупателя
-- `email?: string` — почта покупателя
-
-**Содержит методы:**
-
-- `update(date: Partial<IBuyer>): void` - частичное обновление данных покупателя
-- `getData(): IBuyer` - получение всех данных покупателя
-- `validate(): IErrors | undefined` - проверка данных покупателя
-- `clear(): void` - очищает данные покупателя
-
-### Слой коммуникации `WebLarёkApi`
-
-**Свойство класса:**
-
-- `constructor(api: IApi)` - в конструктор передается экземпляр класса, соответсвующий интерфейсу `IApi`
-
-**Содержит методы:**
-
-- `getProducts(): Promise<IApiProducts>` - получает с сервера объект с массивом товаров
-- `postOrder(data: TOrder): Promise<TOrderResponse>` - отправляет на сервер данные о покупателе и выбранных
-  товарах
-
-### Представление
-
-Все классы представления наследуются от родительского класса `Component`.
-
-#### `Header`
-
-**Назначение:** Отображение шапки сайта с кнопкой корзины и счетчиком товаров
-**Конструктор:**
-`constructor(container: HTMLElement, onClick?: () => void)` — принимает контейнер и обработчик клика для кнопки корзины
-
-**Свойства класса:**
-
-- `headerBasket` — кнопка корзины
-- `headerBasketCounter` — счетчик количества товаров в корзине
-
-**Методы:**
-
-- `set counter(value: number)` — обновляет счетчик товаров в корзине
-- `render(data?: { counter: number })` — отрисовывает компонент
-
-#### `Modal`
-
-**Назначение:** Управление модальными окнами
-**Конструктор:**  
-`constructor(container: HTMLElement)`—контейнер
-
-**Свойства класса:**
-
-- `closeButton: HTMLElement` — кнопка закрытия диалогового окна
-- `content: HTMLElement` — область для вставки контента
-
-**Методы:**
-
-- `open(content?: HTMLElement)` - открывает модальное окно с содержимым
-- `close()` — закрывает модальное окно
-- `setContent(content: HTMLElement)` — устанавливает содержимое окна
-- `isOpen(): boolean` — проверяет, открыто ли окно
-- `getContent(): HTMLElement | null` — возвращает текущее содержимое
-
-#### `Gallery`
-
-**Назначение:** Контейнер для отображения карточек товаров
-**Конструктор:**  
-`constructor(container: HTMLElement)` — задает контейнер для галереи
-
-**Методы:**
-- `set renderedCards(cards: HTMLElement[])` — отображает массив карточек товаров
-- `render(data?: { cards: HTMLElement[] })` — отрисовывает галерею с карточками
-
-
-#### `Basket`
-
-**Назначение:** Корзина покупок
-**Конструктор:**  
-`constructor(container: HTMLElement, onClick?: () => void)` — принимает контейнер и обработчик клика для кнопки оформления
-
-**Свойства:**
-- `element: HTMLElement` — публичный геттер для доступа к DOM элементу
-- `basketList: HTMLElement` — контейнер для списка товаров
-- `basketButton: HTMLButtonElement` — кнопка оформления заказа
-- `basketPrice: HTMLElement` — элемент с общей стоимостью
-
-**Методы:**
-- `set totalPrice(value: number)` — устанавливает общую стоимость товаров
-- `set buttonOrder(enabled: boolean)` — активирует/деактивирует кнопку оформления
-- `set renderedCards(cards: HTMLElement[])` — отображает товары в корзине
-- `render(): HTMLElement` — отрисовывает компонент корзины
-
-#### `OrderSuccess`
-
-**Назначение:** Сообщение об успешном оформлении заказа
-**Конструктор:**  
-`constructor(container: HTMLElement, onClick?: () => void)` — принимает контейнер и обработчик клика для кнопки закрытия
-
-**Свойства:**
-- `orderSuccessDescription: HTMLElement` — элемент отображает сумму заказа
-- `orderSuccessClose: HTMLButtonElement` — кнопка закрытия сообщения
-
-**Методы:**
-- `set orderSuccessMessage(value: number)` — устанавливает сумму заказа
-- `render(data?: { total: number })` — отрисовывает компонент
-
-#### Cards
-
-##### `CardBase`
-
-**Назначение:** Базовые свойства и методы для всех типов карточек
-**Конструктор:**  
-`constructor(container: HTMLElement)` — контейнер
+**Назначение:** Хранение и управление товарами магазина.
 
 **Свойства:**
 
-- `cardTitle: HTMLElement` — заголовок товара
-- `cardPrice: HTMLElement` — цена товара
+- `private items: IProduct[]` - массив всех товаров
+- `private selectedItem: IProduct | null` - выбранный товар для детального просмотра
 
 **Методы:**
 
-- `set title(value: string)` — устанавливает заголовок
-- `set price(value: number | null)` — устанавливает цену ("Бесценно" для null)
-- `render(data?: Partial<T>)` — базовый метод отрисовки
+- `setItems(apiProducts: IProduct[]): void` - сохранение товаров из API с обработкой изображений
+- `getItems(): IProduct[]` - получение всех товаров
+- `getItemById(id: string): IProduct | undefined` - получение товара по ID
+- `setSelectedItem(id: string): boolean` - установка выбранного товара
+- `getSelectedItem(): IProduct | null` - получение выбранного товара
 
-##### `CardBasket`
+#### 2. `ShoppingCart` - Корзина покупок
 
-**Назначение:** Карточка товара в корзине покупок
-**Конструктор:**  
-`constructor(container: HTMLElement, onClick?: () => void) ` — принимает контейнер и брокер событий, навешивает обработчик клика
-
-**Свойства класса:**
-
-- `element: HTMLElement` — публичный геттер
-- `indexItem: HTMLElement` — элемент с порядковым номером
-- `deleteButton: HTMLButtonElement` — кнопка удаления товара
-
-**Методы:**
-
-- `set index(value: number)` — устанавливает порядковый номер в корзине
-- `render(data?: Partial<IProduct> & { index?: number })` — отрисовывает карточку
-
-##### `CardCatalog`
-
-**Назначение:** Карточка товара в основном каталоге
-**Конструктор:**  
-`constructor(container: HTMLElement, onClick?: () => void) ` — принимает контейнер и брокер событий, навешивает обработчик клика
-
-**Свойства класса:**
-
-- `element: HTMLElement` — публичный геттер
-- `cardCategory: HTMLElement` — элемент категории товара
-- `cardImage: HTMLImageElement` — изображение товара
-
-**Методы:**
-
-- `set category(value: string) ` — устанавливает категорию с цветовым кодированием
-- `set image(value: string)` — устанавливает изображение товара
-- `render(data?: Partial<IProduct>)` — отрисовывает карточку
-
-##### `CardPreview`
-
-**Назначение:** Карточка для детального просмотра товара в модальном окне 
-**Конструктор:**  
-`constructor(container: HTMLElement, onClick?: () => void) ` — принимает контейнер и брокер событий, навешивает обработчик клика
-
-**Свойства класса:**
-
-- `element: HTMLElement` — публичный геттер
-**Свойства:**
-- `cardCategory: HTMLElement` — элемент категории товара
-- `cardImage: HTMLImageElement` — изображение товара
-- `cardText: HTMLElement` — описание товара
-- `button: HTMLButtonElement` — кнопка добавления/удаления
-
-**Методы:**
-
-- `set category(value: string)` — устанавливает категорию
-- `set image(value: string)` — устанавливает изображение
-- `set description(value: string)` — устанавливает описание
-- `set buttonText(value: string)` — устанавливает текст кнопки
-- `set buttonDisabled(value: boolean) ` — активирует/деактивирует кнопку
-- `render(data?: Partial<IProduct>) ` — отрисовывает карточку
-
-#### Forms
-
-Формы используют двухэтапную валидацию:
-1. **FormOrder** — проверяет выбор способа оплаты и длину адреса (минимум 10 символов)
-2. **FormContacts** — проверяет корректность email и телефонного номера
-
-Валидация происходит в реальном времени при вводе данных.
-
-#### `FormBase`
-
-**Назначение:** Базовый класс для всех форм
-**Конструктор:**  
-`constructor(container: HTMLElement)` — принимает контейнер формы
-
-**Свойства:**
-- `formErrors: HTMLElement` — элемент для отображения ошибок валидации
-- `submitButton: HTMLButtonElement` — кнопка отправки формы
-- `formErrorsFields: (keyof IFormErrors)[]` — список полей для валидации ошибок
-
-**Методы:**
-- `showErrors(errors: Partial<IFormErrors>)` — отображает ошибки валидации
-- `submitButtonEnable(enabled: boolean)` — активирует/деактивирует кнопку отправки
-
-##### `FormOrder`
-
-**Назначение:** Первый шаг оформления заказа (способ оплаты и адрес)
-**Конструктор:**  
-`constructor(container: HTMLElement, onSubmit?: () => void, onInputChange?: (field: string, value: string) => void)` — принимает контейнер, обработчик отправки и обработчик изменения ввода
+**Назначение:** Управление товарами в корзине.
 
 **Свойства:**
 
-- `element: HTMLElement` — публичный геттер
-- `protected formErrorsFields = ['payment', 'address']` — поля для валидации
+- `private items: IProduct[]` - массив товаров в корзине
 
 **Методы:**
 
-- `setPaymentButtonActive(payment: TPayment)` — активирует выбранный способ оплаты
-- `setAddress(value: string)` — заполняет поле адреса
+- `getItems(): IProduct[]` - получение всех товаров в корзине
+- `addItem(product: IProduct): void` - добавление товара в корзину
+- `removeItem(product: IProduct): void` - удаление товара из корзины
+- `clear(): void` - очистка корзины
+- `getTotal(): number` - расчет общей стоимости
+- `getCount(): number` - количество товаров в корзине
+- `contains(id: string): boolean` - проверка наличия товара в корзине
 
-##### `FormContacts`
+#### 3. `Buyer` - Данные покупателя
 
-**Назначение:** Второй шаг оформления заказа (email и телефон)
-**Конструктор:**  
-`constructor(container: HTMLElement, onSubmit?: () => void, onInputChange?: (field: string, value: string) => void)` — принимает контейнер, обработчик отправки и обработчик изменения ввода
+**Назначение:** Хранение и валидация данных покупателя.
 
-**Свойства класса:**
+**Свойства:**
 
-- `element: HTMLElement` — публичный геттер
-- `emailInput: HTMLInputElement` — поле ввода email
-- `phoneInput: HTMLInputElement` — поле ввода телефона
-- `protected formErrorsFields = ['email', 'phone']` — поля для валидации
+- `protected payment?: TPayment` - способ оплаты
+- `protected email?: string` - email
+- `protected phone?: string` - телефон
+- `protected address?: string` - адрес доставки
 
 **Методы:**
 
-- `setEmail(value: string)` — заполняет поле email
-- `setPhone(value: string)` — заполняет поле телефона
+- `update(data: Partial<IBuyer>): void` - обновление данных
+- `getData(): IBuyer` - получение всех данных
+- `validate(): TFormErrors` - валидация данных
+- `clear(): void` - очистка данных
 
-## Типы взаимодействия в приложении
+### Представления
 
-1. **Пользователь → View** - пользователь взаимодействует с элементами интерфейса
-2. **View → EventEmitter** - View генерирует события при действиях пользователя
-3. **EventEmitter → Presenter (main.ts)** - события обрабатываются в основном файле
-4. **Presenter → Model** - обновление данных в моделях
-5. **Model → EventEmitter** - модели генерируют события при изменении данных
-6. **EventEmitter → View** - View обновляется при получении событий от моделей
+#### 1. `Modal` - Модальные окна
 
-## Особенности работы с изображениями
+**Назначение:** Управление всплывающими окнами.
 
-Приложение использует функцию `fixImagePath()` для преобразования путей к изображениям, полученным с сервера. Сервер возвращает пути типа `/5_Dots.svg`, которые преобразуются в `/images/card/5_Dots.svg` для корректного отображения в интерфейсе.
+**Функции:**
+
+- Открытие/закрытие модальных окон
+- Блокировка прокрутки страницы при открытии
+- Закрытие по клику вне окна или клавише Escape
+
+#### 2. `Header` - Шапка приложения
+
+**Назначение:** Отображение шапки с кнопкой корзины и счетчиком товаров.
+
+**Свойства:**
+
+- `headerBasket` - кнопка корзины
+- `headerBasketCounter` - счетчик товаров
+
+#### 3. `Gallery` - Галерея товаров
+
+**Назначение:** Контейнер для отображения карточек товаров.
+
+#### 4. `Basket` - Корзина
+
+**Назначение:** Отображение списка товаров в корзине.
+
+**Свойства:**
+
+- `basketList` - список товаров
+- `basketButton` - кнопка оформления заказа
+- `basketPrice` - общая стоимость
+
+#### 5. `Success` - Успешное оформление
+
+**Назначение:** Сообщение об успешном оформлении заказа.
+
+### Карточки товаров
+
+#### 1. `CardBase` - Базовый класс
+
+**Назначение:** Общие свойства для всех карточек.
+
+**Свойства:**
+
+- `cardTitle` - заголовок товара
+- `cardPrice` - цена товара
+
+#### 2. `CardCatalog` - Карточка в каталоге
+
+**Назначение:** Отображение товара в основном каталоге.
+
+#### 3. `CardPreview` - Детальный просмотр
+
+**Назначение:** Отображение полной информации о товаре в модальном окне.
+
+**Свойства:**
+
+- `cardCategory` - категория товара
+- `cardImage` - изображение товара
+- `cardText` - описание товара
+- `button` - кнопка добавления/удаления из корзины
+
+#### 4. `CardBasket` - Карточка в корзине
+
+**Назначение:** Отображение товара в корзине покупок.
+
+**Свойства:**
+
+- `indexItem` - порядковый номер
+- `deleteButton` - кнопка удаления
+
+### Формы
+
+#### 1. `BaseForm` - Базовая форма
+
+**Назначение:** Общая логика для всех форм.
+
+**Свойства:**
+
+- `formErrors` - отображение ошибок
+- `submitButton` - кнопка отправки
+
+**Методы:**
+
+- `showErrors(errors: TFormErrors): boolean` - отображение ошибок валидации
+- `submitButtonEnable(enabled: boolean): void` - активация кнопки отправки
+
+#### 2. `OrderForm` - Форма заказа
+
+**Назначение:** Ввод способа оплаты и адреса доставки.
+
+**Свойства:**
+
+- `paymentButtons` - кнопки выбора способа оплаты
+- `addressInput` - поле ввода адреса
+
+#### 3. `ContactsForm` - Форма контактов
+
+**Назначение:** Ввод email и телефона покупателя.
+
+**Свойства:**
+
+- `emailInput` - поле ввода email
+- `phoneInput` - поле ввода телефона
+
+### API слой
+
+#### `WebLarekApi` - Работа с API
+
+**Методы:**
+
+- `getProducts(): Promise<IApiProducts>` - получение списка товаров
+- `postOrder(data: TOrder): Promise<TOrderResponse>` - отправка заказа

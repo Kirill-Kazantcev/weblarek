@@ -1,5 +1,6 @@
-import { Component } from "../base/Component.ts";
+import { Component } from "../base/Component";
 
+// Галерея для отображения карточек товаров
 export class Gallery extends Component<{ cards: HTMLElement[] }> {
   constructor(container: HTMLElement) {
     super(container);
@@ -21,8 +22,6 @@ export class Gallery extends Component<{ cards: HTMLElement[] }> {
   }
 
   private clearContainer(): void {
-    while (this.container.firstChild) {
-      this.container.removeChild(this.container.firstChild);
-    }
+    this.container.innerHTML = '';
   }
 }

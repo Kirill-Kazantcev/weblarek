@@ -2,18 +2,16 @@ import { ensureElement } from "../../../utils/utils";
 import { IProduct } from "../../../types";
 import { CardBase } from "./CardBase";
 import { categoryMap } from "../../../utils/constants";
+import { IEvents } from "../../base/Events";
 
+// Карточка товара в превью (модальное окно)
 export class CardPreview extends CardBase<IProduct> {
   private cardCategory: HTMLElement;
   private cardImage: HTMLImageElement;
   private cardText: HTMLElement;
   private button: HTMLButtonElement;
 
-  get element(): HTMLElement {
-    return this.container;
-  }
-
-  constructor(container: HTMLElement, private onClick?: () => void) {
+  constructor(container: HTMLElement, private events: IEvents) {
     super(container);
     
     this.cardCategory = ensureElement<HTMLElement>('.card__category', this.container);
@@ -21,9 +19,9 @@ export class CardPreview extends CardBase<IProduct> {
     this.cardImage = ensureElement<HTMLImageElement>('.card__image', this.container);
     this.button = ensureElement<HTMLButtonElement>('.card__button', this.container);
     
-    if (this.onClick) {
-      this.button.addEventListener('click', () => this.onClick!());
-    }
+    this.button.addEventListener('click', () => {
+      this.events.emit('card:button-click');
+    });
   }
 
   set category(value: string) {
