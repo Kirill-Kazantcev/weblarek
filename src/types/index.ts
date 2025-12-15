@@ -2,7 +2,9 @@ export type ApiPostMethods = 'POST' | 'PUT' | 'DELETE';
 
 export type TPayment = 'cash' | 'card' | '';
 
-export type TFormErrors = Partial<Record<keyof IBuyer, string>>;
+export type THeaderBasketCounter = {
+  counter: number;
+}
 
 // тип для объекта, отправляемого на сервер при оформлении заказа
 export type TOrder = {
@@ -19,13 +21,6 @@ export type TOrderResponse = {
   total: number;
 }
 
-// Интерфейсы данных
-export interface IApi {
-  get<T extends object>(uri: string): Promise<T>;
-  post<T extends object>(uri: string, data: object, method?: ApiPostMethods): Promise<T>;
-}
-
-// Интерфейс для товара
 export interface IProduct {
   id: string;
   description: string;
@@ -35,7 +30,6 @@ export interface IProduct {
   price: number | null;
 }
 
-// Интерфейс для данных покупателя
 export interface IBuyer {
   payment?: TPayment;
   email?: string;
@@ -43,8 +37,30 @@ export interface IBuyer {
   address?: string;
 }
 
-// Интерфейс ответа API
 export interface IApiProducts {
   total: number;
   items: IProduct[];
+}
+
+export interface IFormErrors {
+  payment?: string;
+  address?: string;
+  email?: string;
+  phone?: string;
+}
+
+export interface ISuccessData {
+  total: number;
+}
+
+
+// Интерфейс для API
+export interface IApi {
+  get<T extends object>(uri: string): Promise<T>;
+  post<T extends object>(uri: string, data: object, method?: ApiPostMethods): Promise<T>;
+}
+
+// Интерфейс клика по кнопке
+export interface ICardAction {
+  onClick: () => void;
 }

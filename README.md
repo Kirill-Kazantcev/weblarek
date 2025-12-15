@@ -121,7 +121,7 @@ interface IProduct {
 }
 ```
 
-Структура данных:
+**Структура данных:**
 
 - `id` - id товара
 - `description` - описание товара
@@ -141,7 +141,7 @@ interface IBuyer {
 }
 ```
 
-Структура данных:
+**Структура данных:**
 
 - `payment` - способ оплаты, `card | cash | ''` 
 - `email` - почта покупателя
@@ -154,12 +154,12 @@ interface IBuyer {
 
 Хранение товаров, которые можно купить в приложении
 
-Свойства класса:
+**Свойства класса:**
 
 - `private items: IProduct[] = []` - хранит массив всех товаров
 - `private checkItem: IProduct | null = null` - хранит товар, выбранный для подробного отображения
 
-Содержит методы:
+**Содержит методы:**
 
 - `setItems(apiProducts: IProduct[]) : void` - сохраняет товары
 - `getItems() : IProduct[]` - получает массив товары
@@ -172,11 +172,11 @@ interface IBuyer {
 
 Хранение товаров, которые пользователь выбрал для покупки
 
-Свойства класса:
+**Свойства класса:**
 
 - `private cartItems: IProduct[] = []` - массив товаров, добавленных в корзину
 
-Содержит методы:
+**Содержит методы:**
 
 - `getCartItems() : IProduct[]` - получение массива товаров, которые находятся в корзине
 - `addToCart(product: IProduct) : void` - добавление товара
@@ -190,28 +190,258 @@ interface IBuyer {
 
 Данные покупателя, которые тот должен указать при оформлении заказа.
 
-Свойства класса:
+**Свойства класса:**
 
 - `payment?: TPayment` — способ оплаты
 - `address?: string` — адрес доставки
 - `phone?: string` — телефон покупателя
 - `email?: string` — почта покупателя
 
-Содержит методы:
+**Содержит методы:**
 
 - `update(date: Partial<IBuyer>): void` - частичное обновление данных покупателя
 - `getData(): IBuyer` - получение всех данных покупателя
 - `validate(): IErrors | undefined` - проверка данных покупателя
 - `clear(): void` - очищает данные покупателя
 
-### Слой коммуникации `WebLarekApi`
+### Слой коммуникации `WebLarёkApi`
 
-Свойство класса:
+**Свойство класса:**
 
-- `constuctor(api: IApi)` - в конструктор передается экземпляр класса, соответсвующий интерфейсу `IApi`
+- `constructor(api: IApi)` - в конструктор передается экземпляр класса, соответсвующий интерфейсу `IApi`
 
-Содержит методы:
+**Содержит методы:**
 
 - `getProducts(): Promise<IApiProducts>` - получает с сервера объект с массивом товаров
 - `postOrder(data: TOrder): Promise<TOrderResponse>` - отправляет на сервер данные о покупателе и выбранных
   товарах
+
+### Представление
+
+Все классы представления наследуются от родительского класса `Component`.
+
+#### `Header`
+
+**Назначение:** Отображение шапки сайта с кнопкой корзины и счетчиком товаров
+**Конструктор:**
+`constructor(container: HTMLElement, onClick?: () => void)` — принимает контейнер и обработчик клика для кнопки корзины
+
+**Свойства класса:**
+
+- `headerBasket` — кнопка корзины
+- `headerBasketCounter` — счетчик количества товаров в корзине
+
+**Методы:**
+
+- `set counter(value: number)` — обновляет счетчик товаров в корзине
+- `render(data?: { counter: number })` — отрисовывает компонент
+
+#### `Modal`
+
+**Назначение:** Управление модальными окнами
+**Конструктор:**  
+`constructor(container: HTMLElement)`—контейнер
+
+**Свойства класса:**
+
+- `closeButton: HTMLElement` — кнопка закрытия диалогового окна
+- `content: HTMLElement` — область для вставки контента
+
+**Методы:**
+
+- `open(content?: HTMLElement)` - открывает модальное окно с содержимым
+- `close()` — закрывает модальное окно
+- `setContent(content: HTMLElement)` — устанавливает содержимое окна
+- `isOpen(): boolean` — проверяет, открыто ли окно
+- `getContent(): HTMLElement | null` — возвращает текущее содержимое
+
+#### `Gallery`
+
+**Назначение:** Контейнер для отображения карточек товаров
+**Конструктор:**  
+`constructor(container: HTMLElement)` — задает контейнер для галереи
+
+**Методы:**
+- `set renderedCards(cards: HTMLElement[])` — отображает массив карточек товаров
+- `render(data?: { cards: HTMLElement[] })` — отрисовывает галерею с карточками
+
+
+#### `Basket`
+
+**Назначение:** Корзина покупок
+**Конструктор:**  
+`constructor(container: HTMLElement, onClick?: () => void)` — принимает контейнер и обработчик клика для кнопки оформления
+
+**Свойства:**
+- `element: HTMLElement` — публичный геттер для доступа к DOM элементу
+- `basketList: HTMLElement` — контейнер для списка товаров
+- `basketButton: HTMLButtonElement` — кнопка оформления заказа
+- `basketPrice: HTMLElement` — элемент с общей стоимостью
+
+**Методы:**
+- `set totalPrice(value: number)` — устанавливает общую стоимость товаров
+- `set buttonOrder(enabled: boolean)` — активирует/деактивирует кнопку оформления
+- `set renderedCards(cards: HTMLElement[])` — отображает товары в корзине
+- `render(): HTMLElement` — отрисовывает компонент корзины
+
+#### `OrderSuccess`
+
+**Назначение:** Сообщение об успешном оформлении заказа
+**Конструктор:**  
+`constructor(container: HTMLElement, onClick?: () => void)` — принимает контейнер и обработчик клика для кнопки закрытия
+
+**Свойства:**
+- `orderSuccessDescription: HTMLElement` — элемент отображает сумму заказа
+- `orderSuccessClose: HTMLButtonElement` — кнопка закрытия сообщения
+
+**Методы:**
+- `set orderSuccessMessage(value: number)` — устанавливает сумму заказа
+- `render(data?: { total: number })` — отрисовывает компонент
+
+#### Cards
+
+##### `CardBase`
+
+**Назначение:** Базовые свойства и методы для всех типов карточек
+**Конструктор:**  
+`constructor(container: HTMLElement)` — контейнер
+
+**Свойства:**
+
+- `cardTitle: HTMLElement` — заголовок товара
+- `cardPrice: HTMLElement` — цена товара
+
+**Методы:**
+
+- `set title(value: string)` — устанавливает заголовок
+- `set price(value: number | null)` — устанавливает цену ("Бесценно" для null)
+- `render(data?: Partial<T>)` — базовый метод отрисовки
+
+##### `CardBasket`
+
+**Назначение:** Карточка товара в корзине покупок
+**Конструктор:**  
+`constructor(container: HTMLElement, onClick?: () => void) ` — принимает контейнер и брокер событий, навешивает обработчик клика
+
+**Свойства класса:**
+
+- `element: HTMLElement` — публичный геттер
+- `indexItem: HTMLElement` — элемент с порядковым номером
+- `deleteButton: HTMLButtonElement` — кнопка удаления товара
+
+**Методы:**
+
+- `set index(value: number)` — устанавливает порядковый номер в корзине
+- `render(data?: Partial<IProduct> & { index?: number })` — отрисовывает карточку
+
+##### `CardCatalog`
+
+**Назначение:** Карточка товара в основном каталоге
+**Конструктор:**  
+`constructor(container: HTMLElement, onClick?: () => void) ` — принимает контейнер и брокер событий, навешивает обработчик клика
+
+**Свойства класса:**
+
+- `element: HTMLElement` — публичный геттер
+- `cardCategory: HTMLElement` — элемент категории товара
+- `cardImage: HTMLImageElement` — изображение товара
+
+**Методы:**
+
+- `set category(value: string) ` — устанавливает категорию с цветовым кодированием
+- `set image(value: string)` — устанавливает изображение товара
+- `render(data?: Partial<IProduct>)` — отрисовывает карточку
+
+##### `CardPreview`
+
+**Назначение:** Карточка для детального просмотра товара в модальном окне 
+**Конструктор:**  
+`constructor(container: HTMLElement, onClick?: () => void) ` — принимает контейнер и брокер событий, навешивает обработчик клика
+
+**Свойства класса:**
+
+- `element: HTMLElement` — публичный геттер
+**Свойства:**
+- `cardCategory: HTMLElement` — элемент категории товара
+- `cardImage: HTMLImageElement` — изображение товара
+- `cardText: HTMLElement` — описание товара
+- `button: HTMLButtonElement` — кнопка добавления/удаления
+
+**Методы:**
+
+- `set category(value: string)` — устанавливает категорию
+- `set image(value: string)` — устанавливает изображение
+- `set description(value: string)` — устанавливает описание
+- `set buttonText(value: string)` — устанавливает текст кнопки
+- `set buttonDisabled(value: boolean) ` — активирует/деактивирует кнопку
+- `render(data?: Partial<IProduct>) ` — отрисовывает карточку
+
+#### Forms
+
+Формы используют двухэтапную валидацию:
+1. **FormOrder** — проверяет выбор способа оплаты и длину адреса (минимум 10 символов)
+2. **FormContacts** — проверяет корректность email и телефонного номера
+
+Валидация происходит в реальном времени при вводе данных.
+
+#### `FormBase`
+
+**Назначение:** Базовый класс для всех форм
+**Конструктор:**  
+`constructor(container: HTMLElement)` — принимает контейнер формы
+
+**Свойства:**
+- `formErrors: HTMLElement` — элемент для отображения ошибок валидации
+- `submitButton: HTMLButtonElement` — кнопка отправки формы
+- `formErrorsFields: (keyof IFormErrors)[]` — список полей для валидации ошибок
+
+**Методы:**
+- `showErrors(errors: Partial<IFormErrors>)` — отображает ошибки валидации
+- `submitButtonEnable(enabled: boolean)` — активирует/деактивирует кнопку отправки
+
+##### `FormOrder`
+
+**Назначение:** Первый шаг оформления заказа (способ оплаты и адрес)
+**Конструктор:**  
+`constructor(container: HTMLElement, onSubmit?: () => void, onInputChange?: (field: string, value: string) => void)` — принимает контейнер, обработчик отправки и обработчик изменения ввода
+
+**Свойства:**
+
+- `element: HTMLElement` — публичный геттер
+- `protected formErrorsFields = ['payment', 'address']` — поля для валидации
+
+**Методы:**
+
+- `setPaymentButtonActive(payment: TPayment)` — активирует выбранный способ оплаты
+- `setAddress(value: string)` — заполняет поле адреса
+
+##### `FormContacts`
+
+**Назначение:** Второй шаг оформления заказа (email и телефон)
+**Конструктор:**  
+`constructor(container: HTMLElement, onSubmit?: () => void, onInputChange?: (field: string, value: string) => void)` — принимает контейнер, обработчик отправки и обработчик изменения ввода
+
+**Свойства класса:**
+
+- `element: HTMLElement` — публичный геттер
+- `emailInput: HTMLInputElement` — поле ввода email
+- `phoneInput: HTMLInputElement` — поле ввода телефона
+- `protected formErrorsFields = ['email', 'phone']` — поля для валидации
+
+**Методы:**
+
+- `setEmail(value: string)` — заполняет поле email
+- `setPhone(value: string)` — заполняет поле телефона
+
+## Типы взаимодействия в приложении
+
+1. **Пользователь → View** - пользователь взаимодействует с элементами интерфейса
+2. **View → EventEmitter** - View генерирует события при действиях пользователя
+3. **EventEmitter → Presenter (main.ts)** - события обрабатываются в основном файле
+4. **Presenter → Model** - обновление данных в моделях
+5. **Model → EventEmitter** - модели генерируют события при изменении данных
+6. **EventEmitter → View** - View обновляется при получении событий от моделей
+
+## Особенности работы с изображениями
+
+Приложение использует функцию `fixImagePath()` для преобразования путей к изображениям, полученным с сервера. Сервер возвращает пути типа `/5_Dots.svg`, которые преобразуются в `/images/card/5_Dots.svg` для корректного отображения в интерфейсе.
